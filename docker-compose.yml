@@ -1,0 +1,25 @@
+version: "3"
+networks:
+  database:
+  server:
+services:
+  backend:
+    image: node:20
+    volumes:
+      - ./api:/api
+      - /Users/user/Documents/Cursos/mia-cucina/api/node_modulesd
+    command: bash -c "cd /api && npm i && npm i -g tsx && tsx watch src/server.ts"
+    networks:
+      - server
+      - database
+    ports:
+      - 8080:3030
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    ports:
+      - "27017:27017"
+    networks:
+      - database

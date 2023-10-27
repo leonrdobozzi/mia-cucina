@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  myWines MyWines[]
+
+  wines Wine[]
+  Food  Food[]
+}
+
+model Wine {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  wine_image  String
+  name        String
+  grape       String
+  harvest     String
+  type        String
+  rate        String
+  description String
+  createdAt   DateTime @default(now())
+
+  myWines MyWines[]
+  User    User?     @relation(fields: [userId], references: [id])
+  userId  String?   @db.ObjectId
+}
+
+model MyWines {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  wineId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+  wine   Wine   @relation(fields: [wineId], references: [id])
+}
+
+model Food {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  category         FoodCategory @relation(fields: [foodCategoryId], references: [id])
+  preparation_time String
+  dificulty        String
+  ingredients      Ingredient[]
+  revenue          String
+  userId           String       @db.ObjectId
+  user             User         @relation(fields: [userId], references: [id])
+  foodCategoryId   String       @db.ObjectId
+  createdAt        DateTime     @default(now())
+}
+
+model Ingredient {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  quantity  String
+  Food      Food?    @relation(fields: [foodId], references: [id])
+  foodId    String?  @db.ObjectId
+  createdAt DateTime @default(now())
+}
+
+model FoodCategory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  createdAt DateTime @default(now())
+  Food      Food[]
+}
