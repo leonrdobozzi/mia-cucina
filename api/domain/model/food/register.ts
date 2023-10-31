@@ -2,12 +2,6 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../../infrastructure/repository/prisma";
 
-interface IIngredientItem {
-  name: string;
-  quantity: string;
-  foodId?: string;
-}
-
 export async function registerFood(app: FastifyInstance) {
   app.addHook("preHandler", async (request) => {
     await request.jwtVerify();
@@ -18,6 +12,7 @@ export async function registerFood(app: FastifyInstance) {
         name: z.string(),
         category: z.string(),
         preparation_time: z.string(),
+        image: z.string(),
         dificulty: z.string(),
         ingredients: z.array(
           z.object({
@@ -36,7 +31,21 @@ export async function registerFood(app: FastifyInstance) {
         dificulty,
         ingredients,
         revenue,
+        image,
       } = bodySchema.parse(request.body);
+
+      const permitedCategories: String[] = [
+        "pasta",
+        "barbecue",
+        "burguer",
+        "lunch",
+        "others",
+      ];
+
+      if (!permitedCategories.includes(category))
+        return response
+          .status(401)
+          .send({ message: "Category not permited", permitedCategories });
 
       const categoryExists = await prisma.foodCategory.findFirst({
         where: {
@@ -44,40 +53,34 @@ export async function registerFood(app: FastifyInstance) {
         },
       });
 
-      let categoryCreated;
-
-      if (!categoryExists) {
-        categoryCreated = await prisma.foodCategory.create({
-          data: {
-            name,
-          },
-        });
-      }
-
-      const foodCategoryIdFiltered = categoryExists
-        ? categoryExists.id
-        : categoryCreated.id;
+      const categoryRegistered = !categoryExists
+        ? await prisma.foodCategory.create({
+            data: {
+              name: category,
+            },
+          })
+        : categoryExists;
 
       const food = await prisma.food.create({
         data: {
           name,
-          foodCategoryId: foodCategoryIdFiltered,
+          categoryName: categoryRegistered.name,
+          foodCategoryId: categoryRegistered.id,
           preparation_time,
           dificulty,
           revenue,
+          image,
           userId: request.user.sub,
+          isPublic: true,
         },
       });
 
-      const ingredientsWithFoodId: IIngredientItem[] = [];
-
       for (const ingredientIndex in ingredients) {
-        (ingredients[ingredientIndex].foodId = food.id),
-          ingredientsWithFoodId.push(ingredients[ingredientIndex]);
+        ingredients[ingredientIndex].foodId = food.id;
       }
 
       const ingredientsSavedInDatabase = await prisma.ingredient.createMany({
-        data: [...ingredientsWithFoodId],
+        data: [...ingredients],
       });
 
       return response.status(201).send({

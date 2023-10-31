@@ -1,14 +1,19 @@
 import { View, Image, Text, StyleSheet } from "react-native";
 
-import WineImage from "../assets/vinho.png";
-
-export default function WineItem() {
+export default function WineItem({
+  title,
+  description,
+  subdescription,
+  image,
+}) {
   return (
     <View style={styles.wineCard}>
-      <Image style={styles.wineCardImage} source={WineImage} />
-      <Text style={styles.wineCardTitle}>Tempos de Góes</Text>
-      <Text style={styles.wineCardSubtitle}>Cabernet Sauvignon</Text>
-      <Text style={styles.wineCardSubtitle}>Seco</Text>
+      <Image style={styles.wineCardImage} source={{ uri: image }} />
+      <Text style={styles.wineCardTitle}>{title}</Text>
+      <Text style={styles.wineCardSubtitle}>{description}</Text>
+      {subdescription && (
+        <Text style={styles.wineCardSubtitle}>{subdescription}</Text>
+      )}
     </View>
   );
 }
@@ -33,6 +38,7 @@ const styles = StyleSheet.create({
   },
   wineCardImage: {
     width: "100%",
+    height: 100,
   },
 
   wineCardTitle: {

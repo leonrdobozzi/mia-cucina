@@ -27,16 +27,14 @@ export async function uploadRoutes(app: FastifyInstance) {
 
     const fileName = fileId.concat(extension);
 
-    console.log(__dirname, "../../upload");
-
     const writeStream = createWriteStream(
-      resolve(__dirname, "../../../upload", fileName),
+      resolve(__dirname, "../../../src/upload", fileName),
     );
 
     await pump(upload.file, writeStream);
 
-    const fullUrl = request.protocol.concat("://").concat(request.hostname);
-    const fileUrl = new URL(`/uploads/${fileName}`, fullUrl).toString();
+    const fullUrl = request.protocol.concat("://").concat("192.168.1.4:8080");
+    const fileUrl = new URL(`/upload/${fileName}`, fullUrl).toString();
 
     return { fileUrl };
   });

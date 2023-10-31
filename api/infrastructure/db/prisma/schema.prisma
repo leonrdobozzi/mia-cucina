@@ -53,6 +53,7 @@ model Food {
   id               String       @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   category         FoodCategory @relation(fields: [foodCategoryId], references: [id])
+  categoryName     String
   preparation_time String
   dificulty        String
   ingredients      Ingredient[]
@@ -61,6 +62,7 @@ model Food {
   userId           String       @db.ObjectId
   user             User         @relation(fields: [userId], references: [id])
   foodCategoryId   String       @db.ObjectId
+  image            String
   createdAt        DateTime     @default(now())
 }
 

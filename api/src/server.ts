@@ -4,21 +4,22 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 import multipart from "@fastify/multipart";
-import { resolve } from "node:path";
 import UserModel from "../application/model/user";
 import WineModel from "../application/model/wine";
 import FoodModel from "../application/model/food";
 import UploadModel from "../application/model/upload";
 import FeedModel from "../application/model/feed";
 
-const app = fastify();
+export const app = fastify();
 
 app.register(multipart);
 
 app.register(require("@fastify/static"), {
-  root: resolve(__dirname, "/upload"),
-  prefix: "/upload",
+  root: __dirname + "/upload",
+  prefix: "/upload/",
 });
+
+console.log(__dirname + "/upload");
 
 app.register(cors, {
   origin: true,

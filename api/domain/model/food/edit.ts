@@ -14,11 +14,20 @@ export async function updateMyFood(app: FastifyInstance) {
         preparation_time: z.string().optional(),
         dificulty: z.string().optional(),
         revenue: z.string().optional(),
+        category: z.string().optional(),
       });
 
-      const { name, preparation_time, dificulty, revenue } = bodySchema.parse(
-        request.body,
-      );
+      const { name, category, preparation_time, dificulty, revenue } =
+        bodySchema.parse(request.body);
+
+      if (
+        category !== "pasta" &&
+        category !== "barbecue " &&
+        category !== "burguer" &&
+        category !== "lunch" &&
+        category !== "others"
+      )
+        return response.status(401).send({ message: "Category not permited" });
 
       const food = await prisma.food.findFirst({
         where: {
@@ -36,6 +45,7 @@ export async function updateMyFood(app: FastifyInstance) {
         },
         data: {
           name,
+          categoryName: category,
           preparation_time,
           dificulty,
           revenue,

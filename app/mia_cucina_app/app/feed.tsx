@@ -6,41 +6,56 @@ import {
   View,
   Text,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 
 import Pastas from "../src/assets/icons/pastas.png";
 import Barbecue from "../src/assets/icons/barbecue.png";
 import Burguer from "../src/assets/icons/burguer.png";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CardFeed from "../src/components/CardFeed";
-import CardFeedImage from "../src/assets/imageCardFeed.png";
-import BurguerFeedImage from "../src/assets/burguer-image.png";
-import SaladFeedImage from "../src/assets/salada.png";
+import { api } from "../src/services/api";
+import * as SecureStore from "expo-secure-store";
 
 export default function Feed() {
   const [filter, setFilter] = useState("");
-  const items = [
-    {
-      image: CardFeedImage,
-      category: "barbecue",
-      title: "Churrasco com chimarrão",
-      sendedFor: "Manoel Churrasqueiro",
-    },
-    {
-      image: BurguerFeedImage,
-      category: "burguer",
-      title: "Hamburguer Gourmet",
-      sendedFor: "Paola Carosella",
-    },
-    {
-      image: SaladFeedImage,
-      category: "pasta",
-      title: "Macarrão carbonara",
-      sendedFor: "Leonardo Bozzi",
-    },
-  ];
+  const [items, setItems] = useState([]);
+  const [loadingFeed, setLoadingFeed] = useState("Carregando o feed...");
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  async function handlerGetFeed() {
+    const token = await SecureStore.getItemAsync("token");
+    try {
+      const response = await api.get("/feed", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setItems(response.data);
+    } catch (e) {
+      setLoadingFeed("Nada para mostrar no feed!");
+      setItems([]);
+    }
+  }
+
+  useEffect(() => {
+    handlerGetFeed();
+  }, []);
+
+  async function onRefresh() {
+    setRefreshing(true);
+    setLoadingFeed("Recarregando o feed!");
+    await handlerGetFeed();
+    setRefreshing(false);
+  }
+
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <TextInput
         style={styles.searchInput}
         placeholder="Pesquise por um prato aqui"
@@ -109,38 +124,29 @@ export default function Feed() {
       </View>
       <Text style={styles.textSection}>Feeds Recents</Text>
       <View style={styles.cardFeedContainer}>
+        {items.length <= 0 && <Text>{loadingFeed}</Text>}
         {items.map((item) => {
-          return filter === "" ? (
-            <CardFeed
-              title={item.title}
-              sendedFor={item.sendedFor}
-              key={item.image}
-              image={item.image}
-            />
-          ) : filter === "barbecue" && item.category === "barbecue" ? (
-            <CardFeed
-              title={item.title}
-              sendedFor={item.sendedFor}
-              key={item.image}
-              image={item.image}
-            />
-          ) : filter === "burguer" && item.category === "burguer" ? (
-            <CardFeed
-              title={item.title}
-              sendedFor={item.sendedFor}
-              key={item.image}
-              image={item.image}
-            />
-          ) : filter === "pasta" && item.category === "pasta" ? (
-            <CardFeed
-              title={item.title}
-              sendedFor={item.sendedFor}
-              key={item.image}
-              image={item.image}
-            />
-          ) : (
-            ""
-          );
+          if (filter === item.categoryName) {
+            return (
+              <CardFeed
+                title={item.name}
+                sendedFor={item.username}
+                key={item.id}
+                image={item.image}
+              />
+            );
+          } else if (filter !== "" && filter !== item.categoryName) {
+            return <Text>Não há novos feeds por aqui 😔</Text>;
+          } else if (filter === "") {
+            return (
+              <CardFeed
+                title={item.name}
+                sendedFor={item.username}
+                key={item.id}
+                image={item.image}
+              />
+            );
+          }
         })}
       </View>
     </ScrollView>

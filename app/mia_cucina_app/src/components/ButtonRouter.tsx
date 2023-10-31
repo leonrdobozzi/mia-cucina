@@ -5,11 +5,13 @@ export default function ButtonRouter({ route, text }) {
   const router = useRouter();
   return (
     <TouchableOpacity
-      onPress={() => router.push(route)}
+      onPress={() => {
+        route();
+      }}
       activeOpacity={0.8}
       style={styles.button}
     >
-      <Text style={styles.buttonText}>Fazer login</Text>
+      <Text style={styles.buttonText}>{text}</Text>
     </TouchableOpacity>
   );
 }

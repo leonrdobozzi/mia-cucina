@@ -1,6 +1,11 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../../infrastructure/repository/prisma";
 import { RequestWithParams } from "../../../src/request";
+import { Food } from "@prisma/client";
+
+interface IFoodWithCategory extends Food {
+  category?: string;
+}
 
 export async function readMyFoods(app: FastifyInstance) {
   app.addHook("preHandler", async (request) => {
@@ -11,7 +16,7 @@ export async function readMyFoods(app: FastifyInstance) {
     try {
       const userId = request.user.sub;
 
-      const foods = await prisma.food.findMany({
+      const foods: IFoodWithCategory[] = await prisma.food.findMany({
         where: {
           userId,
         },
@@ -19,6 +24,19 @@ export async function readMyFoods(app: FastifyInstance) {
 
       if (foods.length <= 0)
         return response.status(404).send({ message: "Foods not found" });
+
+      const foodWithCategory: IFoodWithCategory[] = [];
+
+      for (const food in foods) {
+        const category = await prisma.foodCategory.findFirst({
+          where: {
+            id: foods[food].foodCategoryId,
+          },
+        });
+
+        foods[food].category = category?.name;
+        foodWithCategory.push(foods[food]);
+      }
 
       return response.status(200).send(foods);
     } catch (e) {

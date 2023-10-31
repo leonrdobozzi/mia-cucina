@@ -1,7 +1,19 @@
 import { TextInput, StyleSheet } from "react-native";
 
-export default function FormInput({ placeholder }) {
-  return <TextInput style={styles.input} placeholder={placeholder} />;
+export default function FormInput({
+  placeholder,
+  emailHandler = undefined,
+  passwordHandler = undefined,
+}) {
+  return (
+    <TextInput
+      onChangeText={(e) =>
+        emailHandler ? emailHandler(e) : passwordHandler(e)
+      }
+      style={styles.input}
+      placeholder={placeholder}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

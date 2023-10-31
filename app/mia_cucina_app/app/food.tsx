@@ -3,44 +3,41 @@ import {
   StyleSheet,
   Text,
   Image,
-  TextInput,
   RefreshControl,
+  TextInput,
   View,
 } from "react-native";
 
-import WineAdd from "../src/assets/icons/wine-add.png";
+import FoodAdd from "../src/assets/icons/food-add.png";
 import ConsumibleItem from "../src/components/ConsumibleItem";
 
-import * as SecureStore from "expo-secure-store";
+import { useState } from "react";
 import { api } from "../src/services/api";
-import React, { useEffect, useState } from "react";
 
-export default function Wine() {
+import * as SecureStore from "expo-secure-store";
+
+export default function Food() {
   const [refreshing, setRefreshing] = useState(false);
 
-  const [wines, setWines] = useState([]);
+  const [foods, setFoods] = useState([]);
 
-  async function handlerGetWine() {
+  async function handlerGetFood() {
     const token = await SecureStore.getItemAsync("token");
     try {
-      const response = await api.get("/wine", {
+      const response = await api.get("/food", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setWines(response.data);
+      setFoods(response.data);
     } catch (e) {
       console.log(e);
     }
   }
 
-  useEffect(() => {
-    handlerGetWine();
-  }, []);
-
   async function onRefresh() {
     setRefreshing(true);
-    await handlerGetWine();
+    await handlerGetFood();
     setRefreshing(false);
   }
 
@@ -54,28 +51,24 @@ export default function Wine() {
         <View>
           <TextInput
             style={styles.searchInput}
-            placeholder="Pesquise por um vinho aqui"
+            placeholder="Pesquise por um prato aqui"
           />
-          <View style={styles.categoryContainer}>
-            <Text style={styles.categoryText}>Cabernet Sauvignon</Text>
-            <Text style={styles.categoryText}>Malbec</Text>
-          </View>
-          <Text style={styles.sessionTitle}>Sua lista de vinhos</Text>
-          <View style={styles.wineCardContainer}>
-            {wines.map((wine) => (
+          <Text style={styles.sessionTitle}>Sua lista de comidas</Text>
+          <View style={styles.foodCardContainer}>
+            {foods.map((food) => (
               <ConsumibleItem
-                title={wine.name}
-                description={wine.grape}
-                subdescription={wine.type}
-                key={wine.id}
-                image={wine.wine_image}
+                image={food.image}
+                title={food.name}
+                description={food.categoryName}
+                subdescription={""}
+                key={food.id}
               />
             ))}
           </View>
         </View>
       </ScrollView>
-      <View style={styles.buttonAddWine}>
-        <Image source={WineAdd} />
+      <View style={styles.buttonAddFood}>
+        <Image source={FoodAdd} />
       </View>
     </>
   );
@@ -84,18 +77,12 @@ export default function Wine() {
 const styles = StyleSheet.create({
   searchInput: {
     backgroundColor: "#f0f0f5",
-    marginVertical: 50,
+    marginTop: 50,
     marginHorizontal: 30,
     fontFamily: "Italiana_400Regular",
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 40,
-  },
-  categoryContainer: {
-    marginHorizontal: 20,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 30,
   },
   categoryText: {
     textDecorationColor: "#292929",
@@ -112,16 +99,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontFamily: "Italiana_400Regular",
   },
-  wineCard: {
-    backgroundColor: "#292929",
-    width: "45%",
-    borderRadius: 10,
-    paddingBottom: 20,
-    overflow: "hidden",
-    marginTop: 30,
-  },
 
-  wineCardContainer: {
+  foodCardContainer: {
     marginHorizontal: 20,
     marginBottom: 20,
     paddingBottom: 80,
@@ -129,25 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexWrap: "wrap",
   },
-  wineCardImage: {
-    width: "100%",
-  },
-
-  wineCardTitle: {
-    color: "#fff",
-    fontFamily: "Italiana_400Regular",
-    marginTop: 15,
-    marginBottom: 5,
-    marginHorizontal: 5,
-  },
-
-  wineCardSubtitle: {
-    color: "#808080",
-    marginVertical: 2,
-    fontFamily: "Italiana_400Regular",
-    marginHorizontal: 5,
-  },
-  buttonAddWine: {
+  buttonAddFood: {
     backgroundColor: "#181818",
     width: 70,
     height: 70,

@@ -7,9 +7,13 @@ export default function CardFeed({ image, title, sendedFor }) {
     <View style={styles.cardFeed}>
       <View style={{ position: "relative" }}>
         <View style={styles.cardLike}>
-          <Image source={Like} />
+          <Image source={Like} alt={title} />
         </View>
-        <Image style={styles.imageCardFeed} source={image} />
+        <Image
+          style={styles.imageCardFeed}
+          source={{ uri: image as string }}
+          alt={title}
+        />
       </View>
       <View>
         <Text style={styles.titleCardFeed}>{title}</Text>
@@ -44,6 +48,7 @@ const styles = StyleSheet.create({
   },
   imageCardFeed: {
     width: "100%",
+    height: 120,
   },
   cardLike: {
     backgroundColor: "#fff",
