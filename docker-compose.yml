@@ -2,6 +2,7 @@ version: "3"
 networks:
   database:
   server:
+  app:
 services:
   backend:
     image: node:20

@@ -9,6 +9,7 @@ import UserModel from "../application/model/user";
 import WineModel from "../application/model/wine";
 import FoodModel from "../application/model/food";
 import UploadModel from "../application/model/upload";
+import FeedModel from "../application/model/feed";
 
 const app = fastify();
 
@@ -31,6 +32,7 @@ app.register(UserModel);
 app.register(WineModel);
 app.register(FoodModel);
 app.register(UploadModel);
+app.register(FeedModel);
 
 app
   .listen({

@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { z } from "zod";
+import "@fastify/jwt";
 import { prisma } from "../../../infrastructure/repository/prisma";
 import { RequestWithParams } from "../../../src/request";
 
