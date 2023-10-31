@@ -7,3 +7,6 @@ Aplicativo voltado para receitas e vinhos de sua cozinha, mostrar sua experiênc
 - docker-compose up -d
 - cd /api
 - yarn
+- cd /app
+- yarn
+- yarn start
