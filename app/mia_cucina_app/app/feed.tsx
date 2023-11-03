@@ -125,29 +125,32 @@ export default function Feed() {
       <Text style={styles.textSection}>Feeds Recents</Text>
       <View style={styles.cardFeedContainer}>
         {items.length <= 0 && <Text>{loadingFeed}</Text>}
-        {items.map((item) => {
-          if (filter === item.categoryName) {
-            return (
-              <CardFeed
-                title={item.name}
-                sendedFor={item.username}
-                key={item.id}
-                image={item.image}
-              />
-            );
-          } else if (filter !== "" && filter !== item.categoryName) {
-            return <Text>Não há novos feeds por aqui 😔</Text>;
-          } else if (filter === "") {
-            return (
-              <CardFeed
-                title={item.name}
-                sendedFor={item.username}
-                key={item.id}
-                image={item.image}
-              />
-            );
-          }
-        })}
+        {items.filter((item) => item.category.name === filter).length === 0 &&
+        filter !== "" ? (
+          <Text>Nada por aqui...</Text>
+        ) : (
+          items.map((item) => {
+            if (filter === item.category.name) {
+              return (
+                <CardFeed
+                  title={item.name}
+                  sendedFor={item.user.name}
+                  key={item.id}
+                  image={item.image}
+                />
+              );
+            } else if (filter === "") {
+              return (
+                <CardFeed
+                  title={item.name}
+                  sendedFor={item.user.name}
+                  key={item.id}
+                  image={item.image}
+                />
+              );
+            }
+          })
+        )}
       </View>
     </ScrollView>
   );

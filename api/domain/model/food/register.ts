@@ -14,25 +14,11 @@ export async function registerFood(app: FastifyInstance) {
         preparation_time: z.string(),
         image: z.string(),
         dificulty: z.string(),
-        ingredients: z.array(
-          z.object({
-            name: z.string(),
-            quantity: z.string(),
-            foodId: z.string().optional(),
-          }),
-        ),
         revenue: z.string(),
       });
 
-      const {
-        name,
-        category,
-        preparation_time,
-        dificulty,
-        ingredients,
-        revenue,
-        image,
-      } = bodySchema.parse(request.body);
+      const { name, category, preparation_time, dificulty, revenue, image } =
+        bodySchema.parse(request.body);
 
       const permitedCategories: String[] = [
         "pasta",
@@ -74,18 +60,9 @@ export async function registerFood(app: FastifyInstance) {
         },
       });
 
-      for (const ingredientIndex in ingredients) {
-        ingredients[ingredientIndex].foodId = food.id;
-      }
-
-      const ingredientsSavedInDatabase = await prisma.ingredient.createMany({
-        data: [...ingredients],
-      });
-
       return response.status(201).send({
         message: "Food created with success!",
         food,
-        ingredientsSavedInDatabase,
       });
     } catch (e) {
       console.log(e);

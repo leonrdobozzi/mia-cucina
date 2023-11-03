@@ -6,6 +6,7 @@ import {
   RefreshControl,
   TextInput,
   View,
+  TouchableOpacity,
 } from "react-native";
 
 import FoodAdd from "../src/assets/icons/food-add.png";
@@ -15,8 +16,11 @@ import { useState } from "react";
 import { api } from "../src/services/api";
 
 import * as SecureStore from "expo-secure-store";
+import { router, useRouter } from "expo-router";
 
 export default function Food() {
+  const router = useRouter();
+
   const [refreshing, setRefreshing] = useState(false);
 
   const [foods, setFoods] = useState([]);
@@ -67,9 +71,12 @@ export default function Food() {
           </View>
         </View>
       </ScrollView>
-      <View style={styles.buttonAddFood}>
+      <TouchableOpacity
+        onPress={() => router.push("/add-food")}
+        style={styles.buttonAddFood}
+      >
         <Image source={FoodAdd} />
-      </View>
+      </TouchableOpacity>
     </>
   );
 }
