@@ -64,7 +64,6 @@ export async function registerFood(app: FastifyInstance) {
       const food = await prisma.food.create({
         data: {
           name,
-          categoryName: categoryRegistered.name,
           foodCategoryId: categoryRegistered.id,
           preparation_time,
           dificulty,

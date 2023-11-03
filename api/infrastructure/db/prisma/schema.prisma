@@ -53,7 +53,6 @@ model Food {
   id               String       @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   category         FoodCategory @relation(fields: [foodCategoryId], references: [id])
-  categoryName     String
   preparation_time String
   dificulty        String
   ingredients      Ingredient[]

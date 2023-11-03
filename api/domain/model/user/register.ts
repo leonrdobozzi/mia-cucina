@@ -33,18 +33,19 @@ export async function registerUser(app: FastifyInstance) {
           name,
           password: hashedPassword,
         },
+        select: {
+          name: true,
+          id: true,
+          email: true,
+          isPublic: true,
+          createdAt: true,
+        },
       });
 
-      const userWithoutPassword = Object.fromEntries(
-        Object.entries(user).filter((key) => !key.includes("password")),
-      );
-
-      return response
-        .status(201)
-        .send({
-          message: "User registered with success!",
-          user: userWithoutPassword,
-        });
+      return response.status(201).send({
+        message: "User registered with success!",
+        user,
+      });
     } catch (e) {
       console.log(e);
       return response.status(500).send({ message: "Internal Server Error!" });
